@@ -325,9 +325,6 @@ We used 6 A100 GPUs with 80GB memory for the training.  (Use Lora)
 
 We used 2 A100 GPUs with 80GB memory for the inference. 
 
-## Contact 
-If you have any inquiries, please feel free to raise an issue or reach out to leib2765@gmail.com.
-
 ## Citation
 
 Fortran2CPP: Automating Fortran-to-C++ Translation using LLMs via Multi-Turn Dialogue and Dual-Agent Integration, Dec. 2024, https://arxiv.org/abs/2412.19770 
