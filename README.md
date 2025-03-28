@@ -304,7 +304,8 @@ We used 2 A100 GPUs with 80GB memory for the inference.
 If you have any inquiries, please feel free to raise an issue or reach out to leib2765@gmail.com.
 
 ## Citation
-We will complete the technical introduction paper before mid-May.
+
+Fortran2CPP: Automating Fortran-to-C++ Translation using LLMs via Multi-Turn Dialogue and Dual-Agent Integration, Dec. 2024, https://arxiv.org/abs/2412.19770 
 
 ## Known Issues
 
