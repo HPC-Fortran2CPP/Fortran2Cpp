@@ -4,9 +4,27 @@
 Fortran has been a widely used programming language for scientific computation since 1957. With technological advancements, modern languages like C++ have become preferable for some projects due to their greater flexibility and features. However, the lack of an accurate and comprehensive Fortran-to-C++ translation dataset means that existing large models, including GPT-4, often struggle to perform this task effectively, resulting in translations that may fail to compile or pass unit tests. Fortran2Cpp aims to address this issue.
 Leveraging state-of-the-art Large Language Models (LLMs), Fortran2CPP employs a unique dual-agent system—the Questioner-Solver module—to iteratively translate, validate, and refine code. This process can be used to generate semantics-rich dialogue datasets that can effectively fine-tune open-weight models.
 
-## Models
 
-You can use anyopen-weight models, including 
+## Directory Layout
+
+This repo has the following directory layout
+
+```
+tree -d -L 2
+
+├── Evaluation # script to run model evaluation 
+├── Figures  # some evaluation results figures
+├── Web_demo # web interface demo
+├── data  # sample generated datasets
+├── dataset_generation  # dataset generation python programs
+├── training  # model fine-tuning programs
+├── training_log # some sample logs
+└── utils  # other utility programs
+```
+
+## Large Language Models
+
+You can use any open-weight models, including 
 * WizardCoder-15B-V1.0,
 * CodeLlama-13b-Instruct-hf,
 * starcoder,
