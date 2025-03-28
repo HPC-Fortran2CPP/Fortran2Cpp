@@ -2,42 +2,25 @@
 
 ## Introduction
 Fortran has been a widely used programming language for scientific computation since 1957. With technological advancements, modern languages like C++ have become preferable for some projects due to their greater flexibility and features. However, the lack of an accurate and comprehensive Fortran-to-C++ translation dataset means that existing large models, including GPT-4, often struggle to perform this task effectively, resulting in translations that may fail to compile or pass unit tests. Fortran2Cpp aims to address this issue.
+Leveraging state-of-the-art Large Language Models (LLMs), Fortran2CPP employs a unique dual-agent system—the Questioner-Solver module—to iteratively translate, validate, and refine code. This process can be used to generate semantics-rich dialogue datasets that can effectively fine-tune open-weight models.
 
-This work builts on our previous work: 
-* https://github.com/bin123apple/OpenMP-Fortran-CPP-Translation
+## Models
 
-## Model
-
-We fine-tuned several popular pre-trained models,  including 
+You can use anyopen-weight models, including 
 * WizardCoder-15B-V1.0,
 * CodeLlama-13b-Instruct-hf,
 * starcoder,
 * starcoder2,
-* Magicoder-S-DS-6.7B, and
-* deepseek-coder-33b-instruct. 
+* Magicoder-S-DS-6.7B
 
-After the fine-tuning, the deepseek-coder-33b-instruct shows the greatest improvement when checking with the CodeBLEU Score. Thus we finally use the deepseek-coder-33b-instruct as the backbone of Fortran2CPP.  
 
-The Model is available on Hugging Face: [Fortran2Cpp](https://huggingface.co/Bin12345/Fortran2Cpp) 
-
-**NOTE:** Currently, the model is trained by using a dataset with paired Fortran (f90) and C++ code. We are still training the model. We will continue to update the Fortran2Cpp.
-
-## Evaluation
-We compared with various models (WizardCoder-15B-V1.0, CodeLlama-13b-Instruct-hf, starcoder, Magicoder-S-DS-6.7B, deepseek-coder-33b-instruct and GPT-4) on [HPC_Fortran_CPP](https://huggingface.co/datasets/Bin12345/HPC_Fortran_CPP). And compared the CodeBLEU Score of the generated results.
-
-The CodeBLEU Score Comparison is shown in the figure below:
-
-![CodeBLEU Score Image](Figures/CodeBLEU.png)
-
-### Reproduce Steps
+### Steps to Use Models to Translate Fortran Codes
 
 We recommend using virtual environment to set up the python environments and install required packages:
 
 ```
 python3.9 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-
 pip install -r requirements.txt
 ```
 
@@ -47,7 +30,7 @@ pip install -r requirements.txt
 cd Evaluation
 ```
 
-2. To generate the results. Go the script `text_generation_pipline.py`. 
+2. To generate results. Go the script `text_generation_pipline.py`. 
 
 You can modify things like
 * the model that you want to test: defined between line 9 and line 14.
@@ -119,7 +102,7 @@ cd CodeBLEU
 python calc_code_bleu.py --refs Fortran2Cpp/Evaluation/Groundtruth_C++.txt --hyp <path/to/your/results/txt/file> --lang cpp --params 0.25,0.25,0.25,0.25
 ```
 
-* Run inference on Slurm Cluster: Your should use this script to start the inference: `sbatch <The/following/script>`
+* Run inference on a Slurm Cluster: Your should use this script to start the inference: `sbatch <The/following/script>`
 
 ```
 #!/bin/bash
@@ -162,6 +145,29 @@ srun -n 1 -c 8 --cpu_bind=cores -G 4 --gpu-bind=none  <Your/inference/file/path>
 
 ## Dataset Generation 
 
+The dialogue dataset in **Fortran2CPP** is generated using a structured, automated conversation between two specialized AI agents called the **Questioner** and the **Solver**. Here's how it works, in simple terms:
+
+1. **Initial Translation**:
+   - The **Questioner** first presents the original Fortran code and asks the **Solver** to translate it into C++.
+   - The **Solver** responds by creating the initial translated version of the C++ code.
+
+2. **Unit Test Generation**:
+   - The **Questioner** then requests unit tests—small pieces of code used to automatically check if the translation is correct—for both the original Fortran code and the new C++ version.
+   - The **Solver** generates these tests, ensuring that both the Fortran and C++ versions behave identically.
+
+3. **Compilation and Execution**:
+   - Both Fortran and C++ code are automatically compiled (converted into runnable programs) and executed.
+   - If either program fails at this step (due to errors or bugs), the errors are noted.
+
+4. **Iterative Refinement**:
+   - Using feedback from compilation and execution, the **Questioner** points out the errors and asks the **Solver** to correct the C++ translation.
+   - The **Solver** corrects the code, and the process repeats until the errors are resolved or a maximum number of iterations is reached.
+
+5. **Final Verification**:
+   - After iterative improvements, the **Questioner** checks if the outputs of the Fortran and C++ codes match exactly, confirming the translation is correct.
+
+Throughout these interactions, the back-and-forth conversations—questions, answers, errors, and solutions—are systematically recorded, forming the **multi-turn dialogue dataset**. Each dialogue captures a real translation scenario, including code problems and detailed error-fixing steps, making it highly effective for training artificial intelligence models to better translate and understand programming languages.
+
 1. Setup your OpenAI Key.
 ```
 cd dataset_generation
@@ -194,6 +200,7 @@ A sample log file and json file are stored in
 The dataset that we used is included in `F2C-Translator/data/F2C_dialogue_2.5K.json` file.
 
 ## Inference and Demo
+
 The demo code is modified from [OpenCodeInterpreter](https://github.com/OpenCodeInterpreter/OpenCodeInterpreter/tree/main/demo). Appreciate for their great project!
 
 1. Create conda and install packages
@@ -311,5 +318,3 @@ Fortran2CPP: Automating Fortran-to-C++ Translation using LLMs via Multi-Turn Dia
 
 https://huggingface.co/datasets/Bin12345/HPC_Fortran_CPP seems to have 315 rows of data. However, Groundtruth_C++.txt has only 296 rows.  The reason is that we filtered some long data samples. 
 
-## Acknowledgments
-Appreciation to Lawrence Livermore National Laboratory (Technical Contact: liao6@llnl.gov) for their financial support of this project.
